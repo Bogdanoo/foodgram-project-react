@@ -40,8 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
+    'djoser'
 ]
 
 MIDDLEWARE = [
@@ -132,7 +136,32 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+AUTH_USER_MODEL = 'users.CustomUser'
+MAX_PAGE_AMOUNT = 6
 
-AUTH_USER_MODEL = "users.CustomUser"
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "api/users/reset_password_confirm/?uid={uid}&token={token}",
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+}
+
+DJOSER_EMAIL = {
+    "password_reset": {
+        "email_template_name": "password_reset_email.html",
+        "subject": "Password Reset",
+        "html_email_template_name": "password_reset_email.html",
+        "extra_email_context": None,
+    },
+}

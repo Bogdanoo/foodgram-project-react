@@ -69,7 +69,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Cooking time, min",
-        validators=[validators.MinValueValidator(1)],
+        validators=(validators.MinValueValidator(1),)
     )
     ingredients = models.ManyToManyField(
         Ingredient, verbose_name="ingredients"
@@ -81,6 +81,31 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class IngredientInRecipe(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name="ingredients_in_recipe",
+        verbose_name="recipe",
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name="used_in_recipes",
+        verbose_name="ingredient",
+    )
+    amount = models.PositiveSmallIntegerField(
+        verbose_name="amount",
+        validators=(validators.MinValueValidator(1),)
+    )
+
+    class Meta:
+        verbose_name = "IngredientInRecipe"
+
+    def __str__(self):
+        return f"{self.recipe}-({self.ingredient} - {self.amount})"
 
 
 class Favorite(models.Model):

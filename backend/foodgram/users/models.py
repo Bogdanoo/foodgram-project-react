@@ -23,7 +23,7 @@ class CustomUser(AbstractUser):
         },
     )
     email = models.EmailField(
-        verbose_name="почта",
+        verbose_name="email",
         max_length=254,
         unique=True,
         error_messages={
@@ -41,7 +41,9 @@ class CustomUser(AbstractUser):
         blank=True,
     )
     followers = models.ManyToManyField(
-        "self", related_name="following", blank=True
+        "self",
+        related_name="following",
+        blank=True,
     )
     REQUIRED_FIELDS = ["username", "password", "first_name", "last_name"]
     USERNAME_FIELD = "email"
@@ -57,3 +59,27 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Subscribe(models.Model):
+    author = models.ForeignKey(
+        CustomUser,
+        related_name="following",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        CustomUser,
+        related_name="follower",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = "subscribe"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "author"], name="unique_subscribe"
+            )
+        ]
+
+    def __str__(self):
+        return self.user.username
