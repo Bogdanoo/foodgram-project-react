@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer
-from .fields import Base64ImageField
 from rest_framework import serializers
 
 from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
 from users.models import CustomUser, Subscribe
+
+from .fields import Base64ImageField
 
 User = get_user_model()
 
@@ -55,13 +56,22 @@ class SubscribeSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ("id", "name", "measurement_unit")
+        fields = (
+            "id",
+            "name",
+            "measurement_unit"
+        )
 
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ("id", "name", "color", "slug")
+        fields = (
+            "id",
+            "name",
+            "color",
+            "slug"
+        )
 
 
 class RecipeSerializer(serializers.ModelSerializer):
