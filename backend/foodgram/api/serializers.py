@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer
-from rest_framework import serializers
-
 from recipes.models import Ingredient, IngredientInRecipe, Recipe, Tag
+from rest_framework import serializers
 from users.models import CustomUser, Subscribe
 
 from .fields import Base64ImageField
@@ -74,12 +73,42 @@ class TagSerializer(serializers.ModelSerializer):
         )
 
 
+class IngredientInRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source="ingredient.id")
+    name = serializers.ReadOnlyField(source="ingredient.name", read_only=True)
+    measurement_unit = serializers.ReadOnlyField(
+        source="ingredient.measurement_unit", read_only=True
+    )
+    amount = serializers.IntegerField()
+
+    def validate_amount(self, value):
+        if value < 0:
+            raise serializers.ValidationError(
+                "count cannot be negative."
+            )
+        return value
+
+    class Meta:
+        model = IngredientInRecipe
+        fields = ("id", "name", "measurement_unit", "amount")
+
+
+class CreateIngredientInRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(write_only=True)
+    amount = serializers.IntegerField()
+
+    class Meta:
+        fields = ('id', 'amount')
+        model = IngredientInRecipe
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
     image = Base64ImageField(max_length=None, use_url=True)
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -88,13 +117,24 @@ class RecipeSerializer(serializers.ModelSerializer):
             "tags",
             "author",
             "ingredients",
+            "is_in_shopping_cart",
             "is_favorite",
             "name",
             "image",
             "text",
             "cooking_time",
         )
-        read_only_fields = ("id", "is_favorite")
+        read_only_fields = ("id", "is_favorite", "is_in_shopping_cart")
+
+    def get_ingredients(self, obj):
+        ingredients = IngredientInRecipe.objects.filter(recipe=obj)
+        return IngredientInRecipeSerializer(ingredients, many=True).data
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return obj.shopping_carts.filter(user=request.user).exists()
+        return False
 
     def get_is_favorite(self, obj):
         request = self.context.get("request")
@@ -106,6 +146,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
+    ingredients = CreateIngredientInRecipeSerializer(
+        many=True,
+        write_only=True,
+    )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
@@ -248,9 +292,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         return {
             'id': representation['author']['id'],
-            'username': representation['author']['username'],
             'first_name': representation['author']['first_name'],
             'last_name': representation['author']['last_name'],
+            'username': representation['author']['username'],
             'email': representation['author']['email'],
             'is_subscribed': representation['author']['is_subscribed'],
             'recipes': representation['recipes'],

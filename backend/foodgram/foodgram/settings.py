@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(os.path.join(BASE_DIR.parent.parent, 'infra/.env'), verbose=True)
+load_dotenv(os.path.join(BASE_DIR.parent.parent, '.env'), verbose=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -40,15 +40,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework',
+    'djoser',
+    'corsheaders',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
-    'djoser'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,19 +84,14 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#   DATABASES = {
-#    "default": {
-#       'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
-#       'NAME': os.environ.get('POSTGRES_DB', BASE_DIR / 'db.sqlite3'), 'USER': os.environ.get('POSTGRES_USER'),
-#       'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-#       'HOST': os.environ.get('DB_HOST'),
-#       'PORT': os.environ.get('DB_PORT'),
-#    }
-#   }
 DATABASES = {
     "default": {
-         "ENGINE": "django.db.backends.sqlite3",
-         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+       'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
+       'NAME': os.environ.get('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
+       'USER': os.environ.get('POSTGRES_USER'),
+       'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+       'HOST': os.environ.get('DB_HOST'),
+       'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -144,6 +141,8 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

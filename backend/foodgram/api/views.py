@@ -1,22 +1,24 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from djoser.views import UserViewSet
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
+from users.models import CustomUser, Subscribe
 
-from .permissions import IsAuthorOrReadOnly
-from recipes.models import Favorite, Ingredient, Recipe, Tag
-from users.models import Subscribe, CustomUser
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageNumberPagination
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeDetailShortSerializer,
-                          RecipeSerializer, SubscriptionSerializer,
-                          SubscribeSerializer, TagSerializer)
+                          RecipeSerializer, SubscribeSerializer,
+                          SubscriptionSerializer, TagSerializer)
+from .services import get_shoping_cart_file
 
 User = get_user_model()
 
@@ -133,6 +135,37 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self._create_or_delete_item(
             request, recipe, Favorite, serializer
         )
+
+    def shopping_cart(self, request):
+        recipe = self.get_object()
+        serializer = RecipeDetailShortSerializer
+        return self._create_or_delete_item(
+            request, recipe, ShoppingCart, serializer
+        )
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
+    def download_shopping_cart(self, request):
+        shopping_cart = (
+            IngredientInRecipe.objects.filter(
+                recipe__shopping_carts__user=request.user
+            )
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(amount=Sum('amount'))
+            .order_by('ingredient__name')
+        )
+
+        return get_shoping_cart_file(shopping_cart)
+
+
+class ShoppingListViewSet(viewsets.ModelViewSet):
+    serializer_class = RecipeDetailShortSerializer
+
+    def get_queryset(self):
+        return ShoppingCart.objects.filter(user=self.request.user)
 
 
 class SubscriptionListView(generics.ListAPIView):
