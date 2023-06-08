@@ -29,51 +29,51 @@ class IngredientInRecipeInline(admin.TabularInline):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ("pk", "name", "color", "slug")
-    search_fields = ("name", "slug")
-    ordering = ("name",)
+    list_display = ('pk', 'name', 'color', 'slug')
+    search_fields = ('name', 'slug')
+    ordering = ('name',)
     list_filter = (
-        "name",
-        "color",
-        "slug",
+        'name',
+        'color',
+        'slug',
     )
 
 
 class RecipeAdmin(admin.ModelAdmin):
     inlines = [IngredientInRecipeInline]
-    list_display = ("name", "author", "count_add_favorites")
-    list_filter = ("author", "name", "tags",)
-    search_fields = ("username", "email", "first_name", "last_name",)
-    ordering = ("name",)
+    list_display = ('name', 'author', 'count_add_favorites')
+    list_filter = ('author', 'name', 'tags',)
+    search_fields = ('username', 'email', 'first_name', 'last_name',)
+    ordering = ('name',)
 
     def count_add_favorites(self, obj):
         return obj.favorites.count()
 
-    count_add_favorites.short_description = "Added to favorites"
+    count_add_favorites.short_description = 'Added to favorites'
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ("pk", "name", "measurement_unit")
-    list_filter = ("name",)
-    search_fields = ("ingredient",)
+    list_display = ('pk', 'name', 'measurement_unit')
+    list_filter = ('name',)
+    search_fields = ('ingredient',)
 
 
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ("user", "recipe",)
-    search_fields = ("user", "recipe",)
-    list_filter = ("user", "recipe",)
+    list_display = ('user', 'recipe',)
+    search_fields = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
 
 
 class IngredientInRecipeAdmin(admin.ModelAdmin):
-    list_display = ("recipe", "ingredient", "amount",)
-    search_fields = ("recipe", "ingredient",)
-    list_filter = ("recipe", "ingredient",)
+    list_display = ('recipe', 'ingredient', 'amount',)
+    search_fields = ('recipe', 'ingredient',)
+    list_filter = ('recipe', 'ingredient',)
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ("user", "recipe",)
-    search_fields = ("user", "recipe",)
-    list_filter = ("user", "recipe",)
+    list_display = ('user', 'recipe',)
+    search_fields = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
 
 
 admin.site.register(Recipe, RecipeAdmin)
