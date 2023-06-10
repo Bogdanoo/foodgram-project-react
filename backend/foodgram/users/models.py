@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class CustomUser(AbstractUser):
+class User(AbstractUser):
     class AccessLevels(models.TextChoices):
         ADMIN = "admin"
         AUTHORIZED = "authorized user"
@@ -63,12 +63,12 @@ class CustomUser(AbstractUser):
 
 class Subscribe(models.Model):
     author = models.ForeignKey(
-        CustomUser,
+        User,
         related_name="following",
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
-        CustomUser,
+        User,
         related_name="follower",
         on_delete=models.CASCADE,
     )

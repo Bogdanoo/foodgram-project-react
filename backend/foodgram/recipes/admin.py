@@ -28,6 +28,7 @@ class IngredientInRecipeInline(admin.TabularInline):
     formset = IngredientInRecipeFormSet
 
 
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'color', 'slug')
     search_fields = ('name', 'slug')
@@ -39,6 +40,7 @@ class TagAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = [IngredientInRecipeInline]
     list_display = ('name', 'author', 'count_add_favorites')
@@ -52,33 +54,29 @@ class RecipeAdmin(admin.ModelAdmin):
     count_add_favorites.short_description = 'Added to favorites'
 
 
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'measurement_unit')
     list_filter = ('name',)
     search_fields = ('ingredient',)
 
 
+@admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe',)
     search_fields = ('user', 'recipe',)
     list_filter = ('user', 'recipe',)
 
 
+@admin.register(IngredientInRecipe)
 class IngredientInRecipeAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredient', 'amount',)
     search_fields = ('recipe', 'ingredient',)
     list_filter = ('recipe', 'ingredient',)
 
 
+@admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe',)
     search_fields = ('user', 'recipe',)
     list_filter = ('user', 'recipe',)
-
-
-admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Favorite, FavoriteAdmin)
-admin.site.register(IngredientInRecipe, IngredientInRecipeAdmin)
-admin.site.register(ShoppingCart, ShoppingCartAdmin)
