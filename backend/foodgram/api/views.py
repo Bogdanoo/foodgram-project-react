@@ -1,11 +1,10 @@
 import users.models
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Exists, OuterRef, Sum
-from django.shortcuts import get_object_or_404
+from django.db.models import Count, Exists, OuterRef, Sum, Value
 from django_filters import rest_framework as filters
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
@@ -33,68 +32,37 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class SubscriptionViewSet(viewsets.ModelViewSet):
+class SubscribtionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = SubscribeSerializer
 
-    @staticmethod
-    def subscribe(request):
-        user = request.user
-        author = get_object_or_404(users.models.User, id=id)
-
-        if request.method == 'POST':
-            if user == author:
-                return Response(
-                    {'errors': 'You cant subscribe to yourself'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            subscription, created = users.models.Subscribe.objects.get_or_create(
-                user=user, author=author
-            )
-            if not created:
-                return Response(
-                    {'errors': 'You are already subscribed to this user.'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            serializer = SubscribeSerializer(
-                subscription, context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        elif request.method == 'DELETE':
-            if user == author:
-                return Response(
-                    {'errors': 'You cant unsubscribe from yourself'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            users.models.Subscribe.objects.filter(
-                user=user, author=author
-            ).delete()
-            return Response(
-                'Subscription deleted', status=status.HTTP_204_NO_CONTENT
-            )
-
-        else:
-            return Response(
-                {'errors': 'You are not subscribed to this user'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+    def get_queryset(self):
+        return User.objects.filter(following__user=self.request.user)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeCreateSerializer
+    queryset = Recipe.objects.all()
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = RecipeFilter
     permission_classes = (IsAuthorOrReadOnly, AdminPermission)
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        sub_qs = Recipe.objects.filter(
-            recipe=OuterRef('id'),
-            is_favorited=True,
-        )
         return Recipe.objects.annotate(
-            is_favorited=Exists(sub_qs),
-            is_in_shopping_cart=Exists(sub_qs)
-        )
+            is_favorite=Exists(
+                Recipe.objects.filter(
+                    user=self.request.user, recipe=OuterRef('id'))),
+            is_in_shopping_cart=Exists(
+                ShoppingCart.objects.filter(
+                    user=self.request.user,
+                    recipe=OuterRef('id')))
+        ).select_related('author').prefetch_related(
+            'tags', 'ingredients', 'recipe', 'shopping_cart'
+        ) if self.request.user.is_authenticated else Recipe.objects.annotate(
+            is_in_shopping_cart=Value(False),
+            is_favorite=Value(False),
+        ).select_related('author').prefetch_related(
+            'tags', 'ingredients', 'recipe', 'shopping_cart')
 
     @staticmethod
     def _create_or_delete_item(request, recipe, model, serializer):
