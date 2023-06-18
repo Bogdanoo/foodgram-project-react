@@ -10,7 +10,7 @@ django-filter==23.2
 django-templated-mail==1.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
-djoser==2.2.0
+djoser==2.1.0
 gunicorn==20.0.4
 psycopg2-binary==2.8.6
 idna==3.4
