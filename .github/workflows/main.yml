@@ -1,1 +1,84 @@
+name: foodgram-project-react
 
+on:
+  push:
+    branches:
+      - master
+
+env:
+  IMAGE_NAME: foodgram-project-react
+
+jobs:
+  tests:
+    name: Тестрование кода.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория.
+        uses: actions/checkout@v3
+
+      - name: Развёртывание окружения Python.
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
+
+      - name: Установка необходимых зависимостей.
+        run: | 
+          python -m pip install --upgrade pip 
+          pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
+          pip install -r ./foodgram/requirements.txt  
+
+      - name: Запуск проверки линтером flake8.
+        run: python -m flake8
+
+      - name: Запуск тестов Pytest.
+        run: pytest tests
+
+  build_and_push_to_docker_hub:
+    name: Загрузка docker образа на DockerHub.
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: Проверка доступа репозитория DockerHub.
+        uses: actions/checkout@v3
+
+      - name: Вызов сборщика контейнеров docker.
+        uses: docker/setup-buildx-action@v2
+
+      - name: Авторизации на DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Сборка и Загрузка образа на DockerHub.
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/foodgram/
+          push: true
+          tags: bodyabee/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    name: Развертывание сайта.
+    runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Выполнение удаленных ssh-команд для развертывания.
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo docker compose stop
+            sudo docker compose rm web
+            sudo rm .env
+            touch .env
+            echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+            sudo docker pull bodyabee/${{ env.IMAGE_NAME }}:latest
+            sudo docker compose up -d
