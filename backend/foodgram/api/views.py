@@ -28,7 +28,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.annotate(recipes_count=Count('recipes'))
+        queryset.annotate(recipes_count=Count('recipes'))
         return queryset
 
 
@@ -132,10 +132,9 @@ class SubscriptionListView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        queryset = users.models.Subscribe.objects.filter(
+        return users.models.Subscribe.objects.filter(
             user=self.request.user
         ).select_related('author')
-        return queryset
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
