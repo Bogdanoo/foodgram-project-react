@@ -185,7 +185,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             weight = ingredient_data.get('amount')
             if int(weight) <= 0:
                 raise serializers.ValidationError(
-                    f'weight of ingredient {ingredient_id} must be greater than 0'
+                    f'weight of ingredient '
+                    f'{ingredient_id} must be greater than 0'
                 )
             total_weight += int(weight)
             ingredients.add(ingredient_id)

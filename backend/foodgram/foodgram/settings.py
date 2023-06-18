@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(os.path.join(BASE_DIR.parent.parent, '.env'), verbose=True)
 
-SECRET_KEY = 'django-insecure-7c_))5pdbaa-f%3&6-+&l)@%upw(9c3^6&0%jv3=12#m-a9m=e'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True
 
@@ -65,7 +65,10 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-       'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
+       'ENGINE': os.environ.get(
+           'DB_ENGINE',
+           'django.db.backends.sqlite3'
+       ),
        'NAME': os.environ.get('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
        'USER': os.environ.get('POSTGRES_USER'),
        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
@@ -77,16 +80,24 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.'
+            'UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.'
+            'MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.'
+            'CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.'
+            'NumericPasswordValidator',
     },
 ]
 
@@ -119,6 +130,8 @@ AUTH_USER_MODEL = 'users.User'
 MAX_PAGE_AMOUNT = 6
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': 'api/users/reset_password_confirm/?uid={uid}&token={token}',
-    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL':
+        'api/users/reset_password_confirm/?uid={uid}&token={token}',
+    'PASSWORD_RESET_CONFIRM_RETYPE':
+        True,
 }
