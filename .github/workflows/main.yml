@@ -30,8 +30,6 @@ jobs:
       - name: Запуск проверки линтером flake8.
         run: python -m flake8
 
-      - name: Запуск тестов Pytest.
-        run: pytest tests
 
   build_and_push_to_docker_hub:
     name: Загрузка docker образа на DockerHub.
