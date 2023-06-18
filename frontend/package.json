@@ -15,7 +15,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -38,8 +38,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://127.0.0.1:3000/",
-  "devDependencies": {
-    "@babel/helper-compilation-targets": "^7.22.1"
-  }
+  "proxy": "http://web:8000/"
 }
