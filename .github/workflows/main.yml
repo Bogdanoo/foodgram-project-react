@@ -79,6 +79,5 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             
             sudo docker pull bodyabee/${{ env.IMAGE_NAME }}:latest
-            sudo docker pull bodyabee/infra-frontend:latest
             
             sudo docker compose up -d
