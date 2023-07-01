@@ -29,4 +29,3 @@ services:
       - .env
 volumes:
   pgdata:
-
