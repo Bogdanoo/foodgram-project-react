@@ -11,6 +11,7 @@ services:
       - db
     env_file:
       - .env
+    container_name: backend-1
   frontend:
     build:
       context: ../frontend
