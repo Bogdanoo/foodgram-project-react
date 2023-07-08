@@ -43,7 +43,7 @@ services:
     env_file:
       - ./foodgram/.env
 volumes:
-  postgres_data:
+  pgdata:
   static_value:
   media_value:
   result_build:
