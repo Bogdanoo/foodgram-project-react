@@ -1,6 +1,16 @@
 version: '3.3'
 services:
 
+  backend:
+    image: bodyabee/foodgram-project-react:latest
+    restart: always
+    volumes:
+      - static_value:/app/backend_static/
+      - media_value:/app/backend_media/
+    depends_on:
+      - db
+    env_file:
+      - .env
   frontend:
     build:
       context: ../frontend
@@ -15,14 +25,22 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
+      - static_value:/var/html/backend_static/
+      - media_value:/var/html/backend_media/
+    depends_on:
+      - backend
+      - frontend
   db:
     image: postgres
     ports:
       - "5432:5432"
     volumes:
-      - "./pgdata:/var/lib/postgresql/data"
+      - ./pgdata:/var/lib/postgresql/data
     env_file:
      - .env
 
 volumes:
   pgdata:
+  static_value:
+  media_value:
+  result_build:
