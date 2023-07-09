@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - pgdata:/var/lib/postgresql/data/
     env_file:
      - .env
   backend:
@@ -19,7 +19,6 @@ services:
       - db
     env_file:
       - .env
-    container_name: backend-1
   frontend:
     build:
       context: ../frontend
@@ -41,6 +40,7 @@ services:
       - frontend
 
 volumes:
+  pgdata:
   static_value:
   media_value:
   result_build:
