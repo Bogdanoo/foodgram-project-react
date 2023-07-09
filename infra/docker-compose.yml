@@ -1,17 +1,6 @@
 version: '3.3'
 services:
 
-  backend:
-    image: bodyabee/foodgram-project-react:latest
-    restart: always
-    volumes:
-      - static_value:/app/backend_static/
-      - media_value:/app/backend_media/
-    depends_on:
-      - db
-    env_file:
-      - .env
-    container_name: backend-1
   frontend:
     build:
       context: ../frontend
@@ -29,7 +18,6 @@ services:
       - static_value:/var/html/backend_static/
       - media_value:/var/html/backend_media/
     depends_on:
-      - backend
       - frontend
   db:
     image: postgres
