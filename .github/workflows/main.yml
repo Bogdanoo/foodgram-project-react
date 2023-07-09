@@ -80,4 +80,4 @@ jobs:
             
             sudo docker pull bodyabee/${{ env.IMAGE_NAME }}:latest
             
-            sudo docker compose up -d
+            sudo docker compose up

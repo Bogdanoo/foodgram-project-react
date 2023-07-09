@@ -40,7 +40,6 @@ services:
       - frontend
 
 volumes:
-  pgdata:
   static_value:
   media_value:
   result_build:
