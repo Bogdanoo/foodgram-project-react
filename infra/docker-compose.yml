@@ -2,7 +2,7 @@ version: '3.3'
 services:
 
   backend:
-    image: bodyabee/foodgram-backend:latest
+    image: bodyabee/foodgram-project-react:latest
     restart: always
     volumes:
       - static_value:/app/backend_static/
@@ -13,7 +13,6 @@ services:
       - .env
     container_name: backend-1
   frontend:
-    image: bodyabee/foodgram-frontend:latest
     build:
       context: ../frontend
       dockerfile: Dockerfile
