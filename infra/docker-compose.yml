@@ -1,15 +1,8 @@
 version: '3.3'
 services:
-  db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    env_file:
-     - .env
+
   backend:
-    image: bodyabee/foodgram-project-react:latest
+    image: bodyabee/foodgram-backend:latest
     restart: always
     volumes:
       - static_value:/app/backend_static/
@@ -18,8 +11,9 @@ services:
       - db
     env_file:
       - .env
-
+    container_name: backend-1
   frontend:
+    image: bodyabee/foodgram-frontend:latest
     build:
       context: ../frontend
       dockerfile: Dockerfile
@@ -38,6 +32,14 @@ services:
     depends_on:
       - backend
       - frontend
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+     - .env
 
 volumes:
   postgres_data:
