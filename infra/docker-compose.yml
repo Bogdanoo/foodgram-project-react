@@ -36,12 +36,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data/
     env_file:
      - .env
 
 volumes:
-  pgdata:
+  postgres_data:
   static_value:
   media_value:
   result_build:
