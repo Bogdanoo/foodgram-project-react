@@ -13,7 +13,9 @@ SECRET_KEY = (
 
 DEBUG = True
 
+CSRF_TRUSTED_ORIGINS = ['*']
 ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_WHITELIST = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
