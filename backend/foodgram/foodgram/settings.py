@@ -15,7 +15,7 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ['http://130.193.39.32']
 ALLOWED_HOSTS = ['*']
-CORS_ORIGIN_WHITELIST = ['*']
+CORS_ORIGIN_WHITELIST = ['http://130.193.39.32']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
