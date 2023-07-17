@@ -1,6 +1,6 @@
 import users.models
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Exists, OuterRef, Sum, Value
+from django.db.models import Count, Exists, OuterRef, Sum
 from django_filters import rest_framework as filters
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
@@ -58,11 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     recipe=OuterRef('id')))
         ).select_related('author').prefetch_related(
             'tags', 'ingredients', 'recipe', 'shopping_cart'
-        ) if self.request.user.is_authenticated else Recipe.objects.annotate(
-            is_in_shopping_cart=Value(False),
-            is_favorite=Value(False),
-        ).select_related('author').prefetch_related(
-            'tags', 'ingredients', 'recipe', 'shopping_cart')
+        )
 
     @staticmethod
     def _create_or_delete_item(request, recipe, model, serializer):
