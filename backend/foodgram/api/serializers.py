@@ -204,8 +204,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         data['author'] = self.context['request'].user
 
-        if hasattr(data, 'get'):
-            return data
+        return hasattr(data, 'get')
 
     @staticmethod
     def create_ingredients(ingredients, recipe):
