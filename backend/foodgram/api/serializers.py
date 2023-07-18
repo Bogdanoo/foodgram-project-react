@@ -124,7 +124,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'recipe'
             'id',
             'tags',
             'author',
@@ -167,7 +166,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_cooking_time(self, data):
         cooking_time = data.get('cooking_time')
-        if cooking_time is None or int(cooking_time) <= 0:
+        if cooking_time is None or cooking_time <= 0:
             raise serializers.ValidationError(
                 'Cooking time cannot be negative or 0'
             )
