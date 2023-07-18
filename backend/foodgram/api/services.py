@@ -1,4 +1,5 @@
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse
+
 
 def get_shoping_cart_file(shopping_cart):
     response = HttpResponse(content_type='text/plain')
