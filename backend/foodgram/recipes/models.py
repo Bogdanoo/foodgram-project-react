@@ -67,7 +67,7 @@ class Recipe(models.Model):
         verbose_name='description',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Cooking time, min',
+        verbose_name='Cooking time',
         validators=(validators.MinValueValidator(1),)
     )
     ingredients = models.ManyToManyField(
