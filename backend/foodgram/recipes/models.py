@@ -61,7 +61,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, verbose_name='Tags')
     image = models.ImageField(
         verbose_name='image',
-        upload_to='recipes/',
+        upload_to='/backend_media',
     )
     text = models.TextField(
         verbose_name='description',
