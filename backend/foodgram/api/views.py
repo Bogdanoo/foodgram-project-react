@@ -51,14 +51,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Recipe.objects.annotate(
             is_favorite=Exists(
                 Recipe.objects.filter(
-                    user=self.request.user, recipe=OuterRef('id'))),
+                    author=self.request.user, id=OuterRef('id'))),
             is_in_shopping_cart=Exists(
                 ShoppingCart.objects.filter(
                     user=self.request.user,
                     recipe=OuterRef('id')))
-        ).select_related('author').prefetch_related(
-            'tags', 'ingredients', 'recipe', 'shopping_cart'
-        )
+        ).select_related('author').all()
 
     @staticmethod
     def _create_or_delete_item(request, recipe, model, serializer):
