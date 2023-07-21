@@ -164,7 +164,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('author',)
 
-    def validate_cooking_time(self, data):
+    def validate(self, data):
         cooking_time = data.get('cooking_time')
         if cooking_time is None or cooking_time <= 0:
             raise serializers.ValidationError(
@@ -182,7 +182,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         total_weight = 0
         ingredients = set()
 
-        for ingredient_data in data:
+        for ingredient_data in data.get('ingredients'):
             ingredient_id = ingredient_data['id']
             if ingredient_id in ingredients:
                 raise serializers.ValidationError(
@@ -202,18 +202,18 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'total weight of ingredients must be greater than 0'
             )
 
-        data['author'] = self.context['request'].user
-
         return data
 
     @staticmethod
     def create_ingredients(ingredients, recipe):
-        for ingredient in ingredients:
-            IngredientInRecipe.objects.bulk_create(
-                recipe,
-                ingredient['id'],
-                ingredient['amount']
-            )
+        ingridientsinrecipe = []
+        for ingredientinfo in ingredients:
+            ingrinrecipe = IngredientInRecipe(
+                recipe=recipe,
+                ingredient=Ingredient.objects.get(id=ingredientinfo['id']),
+                amount= ingredientinfo['amount'])
+            ingridientsinrecipe.append(ingrinrecipe)
+        IngredientInRecipe.objects.bulk_create(ingridientsinrecipe)
 
     @staticmethod
     def create_tags(tags, recipe):

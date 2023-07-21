@@ -82,9 +82,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
         return RecipeSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
     def favorite(self, request):
         recipe = self.get_object()
         serializer = RecipeDetailShortSerializer
