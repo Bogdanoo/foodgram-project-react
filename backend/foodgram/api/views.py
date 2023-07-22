@@ -86,11 +86,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST', 'DELETE'])
     def favorite(self, request, pk=None):
-            recipe = Recipe.objects.get(id=pk)
-            serializer = RecipeDetailShortSerializer
-            return self._create_or_delete_item(
-                request, recipe, ShoppingCart, serializer
-            )
+        recipe = Recipe.objects.get(id=pk)
+        serializer = RecipeDetailShortSerializer
+        return self._create_or_delete_item(
+            request, recipe, ShoppingCart, serializer
+        )
 
     @action(detail=True, methods=['POST', 'DELETE'])
     def shopping_cart(self, request, pk=None):
