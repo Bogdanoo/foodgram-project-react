@@ -1,13 +1,14 @@
-import users.models
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
 from django_filters import rest_framework as filters
+from rest_framework import generics, mixins, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+
+import users.models
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
-from rest_framework import generics, mixins, permissions, status, viewsets
-from rest_framework.filters import SearchFilter
-from rest_framework.decorators import action
-from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageNumberPagination
