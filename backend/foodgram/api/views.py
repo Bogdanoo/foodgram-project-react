@@ -82,7 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeSerializer
 
     @action(
-        detail=True,
+        detail=False,
         methods=["post", "delete"],
         permission_classes=[
             permissions.IsAuthenticatedOrReadOnly,
