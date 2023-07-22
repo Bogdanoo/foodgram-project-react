@@ -84,20 +84,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
         return RecipeSerializer
 
-    @action(
-        detail=False,
-        methods=["post", "delete"],
-        permission_classes=[permissions.IsAuthenticatedOrReadOnly]
-    )
-    def favorite(self, request):
-        recipe = self.get_object()
-        serializer = RecipeDetailShortSerializer
-        return self._create_or_delete_item(
-            request, recipe, Favorite, serializer
-        )
+    @action(detail=True, methods=['POST', 'DELETE'])
+    def favorite(self, request, pk=None):
+            recipe = Recipe.objects.get(id=pk)
+            serializer = RecipeDetailShortSerializer
+            return self._create_or_delete_item(
+                request, recipe, ShoppingCart, serializer
+            )
 
-    def shopping_cart(self, request):
-        recipe = self.get_object()
+    @action(detail=True, methods=['POST', 'DELETE'])
+    def shopping_cart(self, request, pk=None):
+        recipe = Recipe.objects.get(id=pk)
         serializer = RecipeDetailShortSerializer
         return self._create_or_delete_item(
             request, recipe, ShoppingCart, serializer
