@@ -34,10 +34,22 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
 
 class SubscribtionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    serializer_class = SubscribeSerializer
+    serializer = SubscribeSerializer
 
     def get_queryset(self):
         return User.objects.filter(following__user=self.request.user)
+
+    @action(detail=True, methods=["post", "delete"])
+    def subscribe(self, request, pk=None):
+        author = users.models.User.objects.get(id=pk)
+        if request.method == 'POST':
+            item = users.models.Subscribe.objects.create(user=request.user, author=author)
+            return Response(self.serializer(item).data, status=status.HTTP_200_OK)
+        if request.method == 'DELETE':
+            item = users.models.Subscribe.objects.get(user=request.user, author=author)
+            item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -84,15 +96,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
         return RecipeSerializer
 
-    @action(detail=True, methods=['POST', 'DELETE'])
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly]
+        )
     def favorite(self, request, pk=None):
         recipe = Recipe.objects.get(id=pk)
         serializer = RecipeDetailShortSerializer
         return self._create_or_delete_item(
-            request, recipe, ShoppingCart, serializer
+            request, recipe, Favorite, serializer
         )
 
-    @action(detail=True, methods=['POST', 'DELETE'])
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+    )
     def shopping_cart(self, request, pk=None):
         recipe = Recipe.objects.get(id=pk)
         serializer = RecipeDetailShortSerializer
@@ -127,7 +146,7 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
 
 class SubscriptionListView(generics.ListAPIView):
     search_fields = ['author__username']
-    permission_classes = [permissions.IsAuthenticated, AdminPermission]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.DjangoFilterBackend, SearchFilter]
     filterset_fields = ['author__username']
     pagination_class = CustomPageNumberPagination
