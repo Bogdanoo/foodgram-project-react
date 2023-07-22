@@ -1,14 +1,15 @@
+from rest_framework.decorators import action
+
+import users.models
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
 from django_filters import rest_framework as filters
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
 from rest_framework import generics, mixins, permissions, status, viewsets
-from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-import users.models
-from recipes.models import (
-    Favorite, Ingredient, IngredientInRecipe, Recipe, ShoppingCart, Tag
-)
+
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageNumberPagination
 from .permissions import AdminPermission, IsAuthorOrReadOnly
@@ -82,12 +83,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeSerializer
 
     @action(
-        detail=False,
+        detail=True,
         methods=["post", "delete"],
         permission_classes=[
             permissions.IsAuthenticatedOrReadOnly,
             AdminPermission
-        ]
+        ],
     )
     def favorite(self, request):
         recipe = self.get_object()
@@ -96,6 +97,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request, recipe, Favorite, serializer
         )
 
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[
+            permissions.IsAuthenticatedOrReadOnly,
+            AdminPermission
+        ],
+    )
     def shopping_cart(self, request):
         recipe = self.get_object()
         serializer = RecipeDetailShortSerializer
@@ -103,15 +112,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request, recipe, ShoppingCart, serializer
         )
 
-    @action(
-        detail=False,
-        methods=['get'],
-        permission_classes=[
-            permissions.IsAuthenticatedOrReadOnly,
-            AdminPermission
-        ]
-    )
-    def download_shopping_cart(self, request):
+    @staticmethod
+    def download_shopping_cart(request):
         shopping_cart = (
             IngredientInRecipe.objects.filter(
                 recipe__shopping_carts__user=request.user
