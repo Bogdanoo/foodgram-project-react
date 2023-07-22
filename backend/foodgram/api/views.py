@@ -6,6 +6,7 @@ from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.filters import SearchFilter
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
@@ -80,6 +81,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
         return RecipeSerializer
 
+    @action(
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
     def favorite(self, request):
         recipe = self.get_object()
         serializer = RecipeDetailShortSerializer
@@ -94,8 +100,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request, recipe, ShoppingCart, serializer
         )
 
-    @staticmethod
-    def download_shopping_cart(request):
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
+    def download_shopping_cart(self, request):
         shopping_cart = (
             IngredientInRecipe.objects.filter(
                 recipe__shopping_carts__user=request.user
