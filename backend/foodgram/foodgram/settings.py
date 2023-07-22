@@ -126,10 +126,10 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'backend_static/')
+STATIC_ROOT = os.path.join(BASE_DIR, '/backend_static/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/backend_media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')
 AUTH_USER_MODEL = 'users.User'
 MAX_PAGE_AMOUNT = 6
 
