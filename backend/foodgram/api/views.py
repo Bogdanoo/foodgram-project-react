@@ -43,10 +43,19 @@ class SubscribtionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def subscribe(self, request, pk=None):
         author = users.models.User.objects.get(id=pk)
         if request.method == 'POST':
-            item = users.models.Subscribe.objects.create(user=request.user, author=author)
-            return Response(self.serializer(item).data, status=status.HTTP_200_OK)
+            item = users.models.Subscribe.objects.create(
+                user=request.user,
+                author=author
+            )
+            return Response(
+                self.serializer(item).data,
+                status=status.HTTP_200_OK
+            )
         if request.method == 'DELETE':
-            item = users.models.Subscribe.objects.get(user=request.user, author=author)
+            item = users.models.Subscribe.objects.get(
+                user=request.user,
+                author=author
+            )
             item.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
