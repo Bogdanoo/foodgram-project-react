@@ -109,7 +109,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=['POST', 'DELETE'],
         permission_classes=[permissions.IsAuthenticatedOrReadOnly]
-        )
+    )
     def favorite(self, request, pk=None):
         recipe = Recipe.objects.get(id=pk)
         serializer = RecipeDetailShortSerializer
@@ -120,6 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['POST', 'DELETE'],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly]
     )
     def shopping_cart(self, request, pk=None):
         recipe = Recipe.objects.get(id=pk)
