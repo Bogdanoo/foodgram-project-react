@@ -2,12 +2,13 @@ import users.models
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
 from django_filters import rest_framework as filters
-from rest_framework import (decorators, generics, mixins, permissions, status,
-                            viewsets)
-from rest_framework.filters import SearchFilter
-from rest_framework.response import Response
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
+from rest_framework import generics, mixins, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageNumberPagination
 from .permissions import AdminPermission, IsAuthorOrReadOnly
@@ -80,7 +81,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
         return RecipeSerializer
 
-    @decorators.action(
+    @action(
         detail=False,
         methods=["post", "delete"],
         permission_classes=[
@@ -102,7 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request, recipe, ShoppingCart, serializer
         )
 
-    @decorators.action(
+    @action(
         detail=False,
         methods=['get'],
         permission_classes=[
