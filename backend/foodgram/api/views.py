@@ -97,6 +97,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request, recipe, Favorite, serializer
         )
 
+    def shopping_cart(self, request):
+        recipe = self.get_object()
+        serializer = RecipeDetailShortSerializer
+        return self._create_or_delete_item(
+            request, recipe, ShoppingCart, serializer
+        )
+
     @action(
         detail=False,
         methods=['get'],
@@ -105,15 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             AdminPermission
         ],
     )
-    def shopping_cart(self, request):
-        recipe = self.get_object()
-        serializer = RecipeDetailShortSerializer
-        return self._create_or_delete_item(
-            request, recipe, ShoppingCart, serializer
-        )
-
-    @staticmethod
-    def download_shopping_cart(request):
+    def download_shopping_cart(self, request):
         shopping_cart = (
             IngredientInRecipe.objects.filter(
                 recipe__shopping_carts__user=request.user
