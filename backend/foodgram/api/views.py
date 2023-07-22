@@ -84,10 +84,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["post", "delete"],
-        permission_classes=[
-            permissions.IsAuthenticatedOrReadOnly,
-            AdminPermission
-        ],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly]
     )
     def favorite(self, request):
         recipe = self.get_object()
@@ -106,10 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=['get'],
-        permission_classes=[
-            permissions.IsAuthenticatedOrReadOnly,
-            AdminPermission
-        ],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly]
     )
     def download_shopping_cart(self, request):
         shopping_cart = (
