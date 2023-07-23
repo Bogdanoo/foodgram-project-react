@@ -1,9 +1,8 @@
-from djoser.views import UserViewSet
-
 import users.models
 from django.contrib.auth import get_user_model
 from django.db.models import Exists, OuterRef, Sum
 from django_filters import rest_framework as filters
+from djoser.views import UserViewSet
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
 from rest_framework import generics, mixins, permissions, status, viewsets
@@ -16,13 +15,18 @@ from .pagination import CustomPageNumberPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeDetailShortSerializer,
-                          RecipeSerializer, SubscribeSerializer, TagSerializer, SubscriptionSerializer)
+                          RecipeSerializer, SubscribeSerializer, TagSerializer,
+                          SubscriptionSerializer)
 from .services import get_shoping_cart_file
 
 User = get_user_model()
 
 
-class SubscribtionViewSet(UserViewSet, mixins.ListModelMixin, viewsets.GenericViewSet):
+class SubscribtionViewSet(
+    UserViewSet,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
     serializer = SubscribeSerializer
 
     @action(detail=True, methods=['POST', 'DELETE'])
@@ -47,10 +51,14 @@ class SubscribtionViewSet(UserViewSet, mixins.ListModelMixin, viewsets.GenericVi
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
-        detail=False, permission_classes=[permissions.IsAuthenticated], methods=["GET"]
+        detail=False,
+        permission_classes=[permissions.IsAuthenticated],
+        methods=["GET"]
     )
     def subscriptions(self, request):
-        queryset = users.models.Subscribe.objects.filter(user=request.user).select_related(
+        queryset = users.models.Subscribe.objects.filter(
+            user=request.user
+        ).select_related(
             'author'
         )
         page = self.paginate_queryset(queryset)
@@ -82,8 +90,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         user=self.request.user,
                         recipe=OuterRef('id')))
             ).select_related('author').all()
-        else:
-            return None
 
     @staticmethod
     def _create_or_delete_item(request, recipe, model, serializer):
