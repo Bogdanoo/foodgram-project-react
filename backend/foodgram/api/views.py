@@ -73,15 +73,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Recipe.objects.annotate(
-            is_favorite=Exists(
-                Recipe.objects.filter(
-                    author=self.request.user, id=OuterRef('id'))),
-            is_in_shopping_cart=Exists(
-                ShoppingCart.objects.filter(
-                    user=self.request.user,
-                    recipe=OuterRef('id')))
-        ).select_related('author').all()
+        if self.request.user.is_authenticated:
+            return Recipe.objects.annotate(
+                is_favorite=Exists(
+                    Recipe.objects.filter(
+                        author=self.request.user, id=OuterRef('id'))),
+                is_in_shopping_cart=Exists(
+                    ShoppingCart.objects.filter(
+                        user=self.request.user,
+                        recipe=OuterRef('id')))
+            ).select_related('author').all()
 
     @staticmethod
     def _create_or_delete_item(request, recipe, model, serializer):
